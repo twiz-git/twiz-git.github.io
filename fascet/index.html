@@ -1,0 +1,1160 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
+<title>[Lost Ark] Ability Stone Probability Optimization Simulator</title>
+
+<style>
+#_div_main > div {
+    margin-bottom: 20px;
+}
+#_div_main * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#_svg_target {
+    max-width: 500px;
+}
+#_svg_target > rect {
+    stroke: #606060;
+    stroke-width: 1px;
+    fill: white;
+    filter: brightness(75%);
+}
+#_svg_target > rect._rect_target {
+    fill: #a5cfff;
+}
+#_svg_target > rect._rect_valid {
+    filter: none;
+}
+#_div_target_range {
+    display: grid;
+    grid-template-columns: minmax(75px, max-content) minmax(auto, 300px);
+    grid-auto-columns: auto;
+    gap: 20px 10px;
+    align-items: center;
+}
+#_div_label_range_S,
+#_div_label_range_A,
+#_div_label_range_B,
+#_div_label_range_C {
+    justify-self: center;
+}
+#_input_range_S,
+#_input_range_A,
+#_input_range_B {
+    direction: rtl;
+}
+._div_control {
+    display: flex;
+    flex-wrap: wrap;
+}
+._div_control > * {
+    margin-right: 5px;
+}
+#_div_display > div {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+#_div_display ._div_label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+#_div_display ._div_display_control > * {
+    display: inline-block;
+}
+#_div_display ._div_label,
+#_div_result_A,
+#_div_result_B,
+#_div_result_C {
+    display: inline-block;
+    width: 15px;
+    text-align: center;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+#_div_display_A > div,
+#_div_display_B > div,
+#_div_display_C > div {
+    display: inline-block;
+    width: 18px;
+    text-align: center;
+}
+#_div_display_A,
+#_div_display_B {
+    color: green;
+}
+#_div_display_A._prefer,
+#_div_display_B._prefer {
+    color: blue;
+}
+#_div_display_C {
+    color: red;
+}
+#_div_display_A > div._fail,
+#_div_display_B > div._fail,
+#_div_display_C > div._fail {
+    color: gainsboro;
+}
+#_div_recommend_A,
+#_div_recommend_B,
+#_div_recommend_C {
+    width: 50px;
+    text-align: center;
+    font-weight: bold;
+}
+#_div_target_probability > span {
+    font-weight: bold;
+    color: #0064d3;
+}
+#_div_target_probability > span._fail {
+    font-weight: bold;
+    color: orangered;
+}
+#_div_help {
+    margin-top: 50px;
+}
+#_div_display_A,
+#_div_display_B {
+    cursor: pointer;
+}
+#_div_display_A._prefer,
+#_div_display_B._prefer {
+    cursor: default;
+}
+#_checkbox_balance {
+    margin-right: 5px;
+}
+</style>
+<div id="_div_main">
+	<div><a href=https://myar.tistory.com/26>Written by MYAR -- https://myar.tistory.com/26</a></div>
+    <div>〈 Goal Settings 〉</div>
+    <div>
+        <svg id="_svg_target"></svg>
+    </div>
+    <div id="_div_target_range">
+        <div id="_div_label_range_S">A+B ≥ 14</div>
+        <input id="_input_range_S" type="range" min="0" max="20" value="6" />
+        <div id="_div_label_range_A">A ≥ 0</div>
+        <input id="_input_range_A" type="range" min="0" max="10" value="10" />
+        <div id="_div_label_range_B">B ≥ 0</div>
+        <input id="_input_range_B" type="range" min="0" max="10" value="10" />
+        <div id="_div_label_range_C">C ≤ 10</div>
+        <input id="_input_range_C" type="range" min="0" max="10" value="10" />
+    </div>
+    <div id="_div_target_probability">&nbsp;</div>
+    <div class="_div_control">
+        <select id="_select_N">
+            <option value="6">6 Nodes</option>
+            <option value="8">8 Nodes</option>
+            <option value="9">9 Nodes</option>
+            <option value="10" selected>10 Nodes</option>
+        </select>
+        <input id="_button_reset" type="button" value="Reset" />
+        <input id="_button_auto" type="button" value="Auto" />
+        <select id="_select_P">
+            <option value="0">25%</option>
+            <option value="1">35%</option>
+            <option value="2">45%</option>
+            <option value="3">55%</option>
+            <option value="4">65%</option>
+            <option value="5" selected>75%</option>
+        </select>
+    </div>
+    <div id="_div_display">
+        <div>
+            <div class="_div_label">A</div>
+            <div id="_div_display_A" class="_prefer"><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div></div>
+            <div id="_div_result_A"></div>
+            <div class="_div_display_control">
+                <input id="_button_succ_A" type="button" value="Success" />
+                <input id="_button_fail_A" type="button" value="Failure" />
+                <input id="_button_perform_A" type="button" value="Random" />
+                <div id="_div_recommend_A"></div>
+            </div>
+        </div>
+        <div>
+            <div class="_div_label">B</div>
+            <div id="_div_display_B"><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div></div>
+            <div id="_div_result_B"></div>
+            <div class="_div_display_control">
+                <input id="_button_succ_B" type="button" value="Success" />
+                <input id="_button_fail_B" type="button" value="Failure" />
+                <input id="_button_perform_B" type="button" value="Random" />
+                <div id="_div_recommend_B"></div>
+            </div>
+        </div>
+        <div>
+            <div class="_div_label">C</div>
+            <div id="_div_display_C"><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div><div>◇</div></div>
+            <div id="_div_result_C"></div>
+            <div class="_div_display_control">
+                <input id="_button_succ_C" type="button" value="Success" />
+                <input id="_button_fail_C" type="button" value="Failure" />
+                <input id="_button_perform_C" type="button" value="Random" />
+                <div id="_div_recommend_C"></div>
+            </div>
+        </div>
+    </div>
+    <div class="_div_control">
+        <input id="_button_undo" type="button" value="Undo" />
+        <input id="_button_redo" type="button" value="Redo" style="display: none" />
+    </div>
+    <div class="_div_control">
+        <label><input id="_checkbox_balance" type="checkbox" checked/>Balanced</label>
+    </div>
+</div>
+<div id="_div_help">
+    <p>This simulator recommends selections that optimize the probabilities and expected values ​​when crafting an ability stone.</p>
+    <p>A and B are increasing ability and C is decreasing ability.</p>
+    <br>
+    <p>〈 Function 〉</p>
+    <p>① Goal setting: Set the desired result area. All other areas are given a weight of 0. Return to the default algorithm in case of failure to achieve the goal.</p>
+    <p>② Preference adjustment: Among A and B, the one that boosts the probability is blue, and the one that does not is green. ◇◇◇... You can change manually by clicking on the line.</p>
+    <p>③ Balance adjustment: The preference is automatically adjusted to the one with the fewest success times among A and B.</p>
+    <p>④ Handwork: You can test it in advance according to the given probability.</p>
+    <p>⑤ Automatic: Assuming preference A, the work is performed according to the recommendation.</p>
+    <br>
+    <p>〈 In-game application method 〉</p>
+    <p>① Select the number of cells. (6 Rare, 8 Epic, 9 Legendary, 10 Relic)</p>
+    <p>② Set a minimum goal. (Assume that results outside the target area are discarded)</p>
+    <p>③ Check the recommendation mark. The ✓ mark appears when the recommendation result changes according to your preference.</p>
+    <p>④ After crafting the items recommended in the game, enter the success/failure results into the simulator.</p>
+    <p>⑤ Repeat ③④.</p>
+    <br>
+    <p>Setting a goal inevitably leads to a higher expected value of C. Think of it as sacrificing C minimization to gain A+B in the target domain.</p>
+    <p>If you prefer the default algorithm, remove the target by setting the A+B target to 0. (color all areas)</p>
+    <p>If there are any changes in future patches, please let us know in the comments.</p>
+    <br>
+    <p>If the program does not work, please use the following link. <a href="https://myar.tistory.com/38">Compatibility version.</a></p>
+    <br>
+    <p>Last updated on 2021-06-29</p>
+</div>
+<script>
+(()=>{
+class KeyMap {
+    constructor() {
+        this.keyArr_xy = [0];
+        this.keyArrArr_st = [];
+        this.keyArrArr_lv = [];
+        this.keyArr_total = [0];
+        this.keySize = 0;
+        this.maxLvKeySize = 0;
+        for (let s = 0; s < 20; s++) {
+            const n = 10 + 1 - Math.abs(s - 10);
+            this.keyArr_xy[s + 1] = this.keyArr_xy[s] + n;
+        }
+        for (let x = 0; x <= 10; x++) {
+            for (let y = 0; y <= 10; y++) {
+                const keyArr_st = [0];
+                for (let st = 0; st < x + y; st++) {
+                    const d = st - Math.max(0, st - x) - Math.max(0, st - y);
+                    const n = ((d + 1) * (d + 2)) >> 1;
+                    keyArr_st[st + 1] = keyArr_st[st] + n;
+                }
+                this.keyArrArr_st[this.getKey_xy(x, y)] = keyArr_st;
+            }
+        }
+        for (let lv = 0; lv <= 30; lv++) {
+            const keyArr_lv = [0];
+            const s0 = Math.max(0, lv - 10);
+            const xy0 = this.keyArr_xy[s0];
+            for (let s = s0; s <= Math.min(lv, 20); s++) {
+                for (let y = Math.max(0, s - 10); y <= Math.min(s, 10); y++) {
+                    const x = s - y;
+                    const z = lv - s;
+                    const xy = this.getKey_xy(x, y);
+                    const xy_ = xy - xy0;
+                    const n = this.getKeySize_st(x, y) * (z + 1) * 6;
+                    keyArr_lv[xy_ + 1] = keyArr_lv[xy_] + n;
+                }
+            }
+            keyArr_lv.pop();
+            this.keyArrArr_lv[lv] = keyArr_lv;
+        }
+        for (let lv = 0; lv <= 30; lv++) {
+            const n = this.getKeySize_lv(lv);
+            this.keyArr_total[lv + 1] = this.keyArr_total[lv] + n;
+            if (n > this.maxLvKeySize) {
+                this.maxLvKeySize = n;
+            }
+            this.keySize += n;
+        }
+        this.keyArr_total.pop();
+    }
+    static get instance() {
+        return this.INSTANCE || (this.INSTANCE = new this());
+    }
+    getKey_xy(x, y) {
+        return this.keyArr_xy[x + y] + y - Math.max(0, x + y - 10);
+    }
+    getKey_st(xy, st, i, j) {
+        return this.keyArrArr_st[xy][st] + (((i + j) * (i + j + 1)) >> 1) + j;
+    }
+    getKey_lv(lv, x, y, st, i, j, zt, p) {
+        const keyArr_lv = this.keyArrArr_lv[lv];
+        const xy = this.getKey_xy(x, y);
+        const xy_ = xy - this.keyArr_xy[Math.max(0, lv - 10)];
+        const z = lv - x - y;
+        let key = this.getKey_st(xy, st, i, j);
+        key *= z + 1;
+        key += zt;
+        key *= 6;
+        key += p;
+        return keyArr_lv[xy_] + key;
+    }
+    getKey(lv, x, y, st, i, j, zt, p) {
+        return this.keyArr_total[lv] + this.getKey_lv(lv, x, y, st, i, j, zt, p);
+    }
+    getKeySize_st(x, y) {
+        const n = Math.min(x, y);
+        const m = Math.max(x, y);
+        return (((((n + 1) * (n + 2) * (2 * n + 3)) / 6) >> 0) + (((n + 1) * (n + 2)) >> 1) * (m - n));
+    }
+    getKeySize_lv(lv) {
+        let size = 0;
+        for (let s = Math.max(0, lv - 10); s <= Math.min(lv, 20); s++) {
+            for (let y = Math.max(0, s - 10); y <= Math.min(s, 10); y++) {
+                const x = s - y;
+                const z = lv - s;
+                size += this.getKeySize_st(x, y) * (z + 1) * 6;
+            }
+        }
+        return size;
+    }
+    getKeySize() {
+        return this.keySize;
+    }
+    getMaxLvKeySize() {
+        return this.maxLvKeySize;
+    }
+}
+class App {
+    constructor() {
+        this.loadData();
+    }
+    static get instance() {
+        return this.INSTANCE || (this.INSTANCE = new this());
+    }
+    isDataLoaded() {
+        return this.data !== undefined;
+    }
+    getPath(state, target) {
+        if (this.isDataLoaded() == false)
+            return '';
+        const { x, y, z, p, st, xt, yt, zt } = this.adjustArgs(state, target);
+        const lv = x + y + z;
+        let key;
+        if (xt > x || yt > y || st > x + y || zt < 0) {
+            key = KeyMap.instance.getKey(lv, x, y, 0, 0, 0, z, p);
+        }
+        else {
+            let i = 0;
+            if (st < xt + y)
+                i = xt - Math.max(0, st - y);
+            let j = 0;
+            if (st < yt + x)
+                j = yt - Math.max(0, st - x);
+            key = KeyMap.instance.getKey(lv, x, y, st, i, j, zt, p);
+        }
+        return this.getPathFromData(key);
+    }
+    adjustArgs(state, target) {
+        const { x, y, z, p, sx, sy, sz } = state;
+        let { st, xt, yt, zt } = target;
+        st -= sx + sy;
+        xt -= sx;
+        yt -= sy;
+        zt -= sz;
+        if (xt < 0)
+            xt = 0;
+        if (yt < 0)
+            yt = 0;
+        if (st < xt + yt)
+            st = xt + yt;
+        if (zt > z)
+            zt = z;
+        return { x, y, z, p, st, xt, yt, zt };
+    }
+    getPathFromData(key) {
+        const q = key >>> 2;
+        const r = key & 0b11;
+        const byte = this.data[q];
+        const shift = 6 - 2 * r;
+        switch ((byte >>> shift) & 0b11) {
+            case 0b01:
+                return 'X';
+            case 0b10:
+                return 'Y';
+            case 0b11:
+                return 'Z';
+            default:
+                return '';
+        }
+    }
+    loadData() {
+        const req = new XMLHttpRequest();
+        req.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                App.instance.data = new Uint8Array(this.response);
+                StateTable.getInstance().load();
+                setTimeout(() => {
+                    new Promise((resolve, _reject) => {
+                        ProbCalc.instance;
+                        resolve(true);
+                    }).then((_value) => {
+                        StateTable.getInstance().load();
+                    });
+                }, 10);
+            }
+        };
+        req.open('GET', "https://tistory2.daumcdn.net/tistory/2296026/skin/images/lostark-stone.blob");
+        req.responseType = 'arraybuffer';
+        req.send();
+    }
+}
+App.pList = [0.25, 0.35, 0.45, 0.55, 0.65, 0.75];
+class ProbCalc {
+    constructor() {
+        this.arrP = new Float64Array(KeyMap.instance.getKeySize());
+        for (let p = 0; p < 6; p++) {
+            this.arrP[p] = 1;
+        }
+        for (let lv = 1; lv <= 30; lv++) {
+            for (let s = Math.max(0, lv - 10); s <= Math.min(lv, 20); s++) {
+                for (let y = Math.max(0, s - 10); y <= Math.min(s, 10); y++) {
+                    const x = s - y;
+                    for (let st = 0; st <= x + y; st++) {
+                        const d = st - Math.max(0, st - x) - Math.max(0, st - y);
+                        for (let ij = 0; ij <= d; ij++) {
+                            for (let j = 0; j <= ij; j++) {
+                                const i = ij - j;
+                                const z = lv - x - y;
+                                for (let zt = 0; zt <= z; zt++) {
+                                    for (let p = 0; p < 6; p++) {
+                                        this.calculate(lv, x, y, st, i, j, zt, p);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ProbCalc.isLoaded = true;
+    }
+    static get instance() {
+        return this.INSTANCE || (this.INSTANCE = new this());
+    }
+    calculate(lv, x, y, st, i, j, zt, p) {
+        const key = KeyMap.instance.getKey(lv, x, y, st, i, j, zt, p);
+        const res = App.instance.getPathFromData(key);
+        const pS = Math.max(p - 1, 0);
+        const pF = Math.min(p + 1, 6 - 1);
+        let selP = 0;
+        if (res == 'X') {
+            let st_xs = st;
+            let i_xs = i;
+            let j_xs = j;
+            let st_xf = st;
+            let j_xf = j;
+            let key_xs = -1;
+            let key_xf = -1;
+            if (x > 0) {
+                if (st <= y && i > 0)
+                    i_xs -= 1;
+                if (st > y || i > 0 || j < st - Math.max(0, st - x))
+                    st_xs -= 1;
+                else if (st >= x)
+                    j_xs -= 1;
+                key_xs = KeyMap.instance.getKey(lv - 1, x - 1, y, st_xs, i_xs, j_xs, zt, pS);
+                if (st >= x) {
+                    if (j > 0)
+                        j_xf -= 1;
+                    else if (i == x - Math.max(0, st - y))
+                        st_xf = x + y;
+                }
+                if (st_xf < x + y)
+                    key_xf = KeyMap.instance.getKey(lv - 1, x - 1, y, st, i, j_xf, zt, pF);
+            }
+            const vS = this.arrP[key_xs];
+            const vF = st_xf < x + y ? this.arrP[key_xf] : 0;
+            selP = this.mergeSF(p, vS, vF, 0);
+        }
+        else if (res == 'Y') {
+            let st_ys = st;
+            let i_ys = i;
+            let j_ys = j;
+            let st_yf = st;
+            let i_yf = i;
+            let key_ys = -1;
+            let key_yf = -1;
+            if (y > 0) {
+                if (st <= x && j > 0)
+                    j_ys -= 1;
+                if (st > x || j > 0 || i < st - Math.max(0, st - y))
+                    st_ys -= 1;
+                else if (st >= y)
+                    i_ys -= 1;
+                key_ys = KeyMap.instance.getKey(lv - 1, x, y - 1, st_ys, i_ys, j_ys, zt, pS);
+                if (st >= y) {
+                    if (i > 0)
+                        i_yf -= 1;
+                    else if (j == y - Math.max(0, st - x))
+                        st_yf = x + y;
+                }
+                if (st_yf < x + y)
+                    key_yf = KeyMap.instance.getKey(lv - 1, x, y - 1, st, i_yf, j, zt, pF);
+            }
+            const vS = this.arrP[key_ys];
+            const vF = st_yf < x + y ? this.arrP[key_yf] : 0;
+            selP = this.mergeSF(p, vS, vF, 0);
+        }
+        else if (res == 'Z') {
+            const z = lv - x - y;
+            let key_zs = -1;
+            let key_zf = -1;
+            if (z > 0) {
+                if (zt > 0)
+                    key_zs = KeyMap.instance.getKey(lv - 1, x, y, st, i, j, zt - 1, pS);
+                key_zf = KeyMap.instance.getKey(lv - 1, x, y, st, i, j, Math.min(zt, z - 1), pF);
+            }
+            const vS = zt > 0 ? this.arrP[key_zs] : 0;
+            const vF = this.arrP[key_zf];
+            selP = this.mergeSF(p, vS, vF, 0);
+        }
+        this.arrP[key] = selP;
+    }
+    mergeSF(p, vS, vF, offset) {
+        return App.pList[p] * (vS + offset) + (1 - App.pList[p]) * vF;
+    }
+    getProbability(state, target) {
+        const { x, y, z, p, st, xt, yt, zt } = App.instance.adjustArgs(state, target);
+        const lv = x + y + z;
+        let key;
+        if (xt > x || yt > y || st > x + y || zt < 0) {
+            return 0;
+        }
+        else {
+            let i = 0;
+            if (st < xt + y)
+                i = xt - Math.max(0, st - y);
+            let j = 0;
+            if (st < yt + x)
+                j = yt - Math.max(0, st - x);
+            key = KeyMap.instance.getKey(lv, x, y, st, i, j, zt, p);
+        }
+        return this.arrP[key];
+    }
+}
+ProbCalc.isLoaded = false;
+App.instance;
+function getElement(id) {
+    return document.getElementById(id);
+}
+function createSVG(tag, attr) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const key in attr) {
+        el.setAttributeNS(null, key, attr[key]);
+    }
+    return el;
+}
+class StateTable {
+    constructor() {
+        this.len = 0;
+        this.rowStateHistory = [];
+        this.undoIndex = 0;
+        this.targetS = 0;
+        this.targetA = 0;
+        this.targetB = 0;
+        this.targetC = 0;
+        this.isPreferB = false;
+        this.isBalanceOn = true;
+    }
+    static getInstance() {
+        return this.INSTANCE || (this.INSTANCE = new this());
+    }
+    load() {
+        if (StateTable.isLoaded) {
+            this.display();
+        }
+    }
+    hardReset(len) {
+        this.len = len;
+        const bonusThreshold = {
+            6: 8,
+            8: 11,
+            9: 12,
+            10: 14
+        }[len];
+        this.targetS = bonusThreshold;
+        this.targetA = 0;
+        this.targetB = 0;
+        this.targetC = len;
+        const lengthStr = `${len}`;
+        const el_S = getElement('_input_range_S');
+        const el_A = getElement('_input_range_A');
+        const el_B = getElement('_input_range_B');
+        const el_C = getElement('_input_range_C');
+        el_S.max = `${len * 2}`;
+        el_A.max = lengthStr;
+        el_B.max = lengthStr;
+        el_C.max = lengthStr;
+        el_S.value = `${len * 2 - bonusThreshold}`;
+        el_A.value = el_A.max;
+        el_B.value = el_B.max;
+        el_C.value = el_C.max;
+        for (const i of 'ABC') {
+            const div = getElement(`_div_display_${i}`);
+            div.innerHTML = '';
+            for (let j = 0; j < len; j++) {
+                const item = document.createElement('div');
+                div.appendChild(item);
+            }
+        }
+        this.drawNewTargetGraph();
+    }
+    static binToArray(bin) {
+        const res = [];
+        while (bin > 1) {
+            if (bin % 2 == 1)
+                res.push(true);
+            else
+                res.push(false);
+            bin = bin >> 1;
+        }
+        return res.reverse();
+    }
+    getCurrentRowState() {
+        if (this.rowStateHistory.length > 0) {
+            if (this.rowStateHistory.length - 1 + this.undoIndex >= 0) {
+                return this.rowStateHistory[this.rowStateHistory.length - 1 + this.undoIndex];
+            }
+        }
+        return { p: 6 - 1, rowA: 1, rowB: 1, rowC: 1 };
+    }
+    getCurrentRowArrays() {
+        const rowState = this.getCurrentRowState();
+        const arrA = StateTable.binToArray(rowState.rowA);
+        const arrB = StateTable.binToArray(rowState.rowB);
+        const arrC = StateTable.binToArray(rowState.rowC);
+        return { p: rowState.p, arrA, arrB, arrC };
+    }
+    reset() {
+        this.rowStateHistory.length = 0;
+        this.undoIndex = 0;
+    }
+    setP(p) {
+        const rowState = this.getCurrentRowState();
+        this.push(Object.assign(Object.assign({}, rowState), { p }));
+    }
+    setTarget(row, value) {
+        switch (row) {
+            case 'S':
+                this.targetS = value;
+                return;
+            case 'A':
+                this.targetA = value;
+                return;
+            case 'B':
+                this.targetB = value;
+                return;
+            case 'C':
+                this.targetC = value;
+                return;
+        }
+    }
+    push(rowState) {
+        this.rowStateHistory.length += this.undoIndex;
+        this.rowStateHistory.push(rowState);
+        this.undoIndex = 0;
+    }
+    addState(row, res) {
+        const rowState = this.getCurrentRowState();
+        const s = Object.assign({}, rowState);
+        const { arrA, arrB, arrC } = this.getCurrentRowArrays();
+        switch (row) {
+            case 'A':
+                if (arrA.length >= this.len)
+                    return;
+                s.rowA <<= 1;
+                s.rowA |= res == 'S' ? 1 : 0;
+                break;
+            case 'B':
+                if (arrB.length >= this.len)
+                    return;
+                s.rowB <<= 1;
+                s.rowB |= res == 'S' ? 1 : 0;
+                break;
+            case 'C':
+                if (arrC.length >= this.len)
+                    return;
+                s.rowC <<= 1;
+                s.rowC |= res == 'S' ? 1 : 0;
+                break;
+        }
+        if (res == 'S') {
+            s.p = Math.max(0, s.p - 1);
+        }
+        else {
+            s.p = Math.min(6 - 1, s.p + 1);
+        }
+        this.push(s);
+    }
+    perform(row) {
+        const p = this.getCurrentRowState().p;
+        if (Math.random() < App.pList[p]) {
+            this.addState(row, 'S');
+        }
+        else {
+            this.addState(row, 'F');
+        }
+    }
+    undo() {
+        this.undoIndex = Math.max(this.undoIndex - 1, -this.rowStateHistory.length);
+    }
+    redo() {
+        this.undoIndex = Math.min(this.undoIndex + 1, 0);
+    }
+    auto() {
+        const { arrA, arrB, arrC } = this.getCurrentRowArrays();
+        let lenA = arrA.length;
+        let lenB = arrB.length;
+        let lenC = arrC.length;
+        if (lenA + lenB + lenC >= 3 * this.len) {
+            this.reset();
+            lenA = 0;
+            lenB = 0;
+            lenC = 0;
+        }
+        while (lenA + lenB + lenC < 3 * this.len) {
+            const { arrA, arrB, arrC, a, b, c, sa, sb, sc, p, st, at, bt, ct } = this.read();
+            const state = { x: a, y: b, z: c, p: p, sx: sa, sy: sb, sz: sc };
+            const target = { st: st, xt: at, yt: bt, zt: ct };
+            const path = App.instance.getPath(state, target);
+            if (path == 'X') {
+                this.perform('A');
+            }
+            else if (path == 'Y') {
+                this.perform('B');
+            }
+            else if (path == 'Z') {
+                this.perform('C');
+            }
+            else {
+                break;
+            }
+            lenA = arrA.length;
+            lenB = arrB.length;
+            lenC = arrC.length;
+        }
+    }
+    setPreferB(bool) {
+        const elA = getElement('_div_display_A');
+        const elB = getElement('_div_display_B');
+        if (bool) {
+            elA.classList.remove('_prefer');
+            elB.classList.add('_prefer');
+            this.isPreferB = true;
+            this.display();
+        }
+        else {
+            elA.classList.add('_prefer');
+            elB.classList.remove('_prefer');
+            this.isPreferB = false;
+            this.display();
+        }
+    }
+    balance() {
+        if (this.isBalanceOn) {
+            const { sa, sb } = this.read();
+            if (sa < sb) {
+                this.setPreferB(false);
+            }
+            else if (sa > sb) {
+                this.setPreferB(true);
+            }
+        }
+    }
+    read() {
+        const { p, arrA, arrB, arrC } = this.getCurrentRowArrays();
+        const a = this.len - arrA.length;
+        const b = this.len - arrB.length;
+        const c = this.len - arrC.length;
+        const sa = arrA.reduce((count, cur) => (cur ? count + 1 : count), 0);
+        const sb = arrB.reduce((count, cur) => (cur ? count + 1 : count), 0);
+        const sc = arrC.reduce((count, cur) => (cur ? count + 1 : count), 0);
+        const st = this.targetS;
+        const at = this.targetA;
+        const bt = this.targetB;
+        const ct = this.targetC;
+        return { arrA, arrB, arrC, a, b, c, sa, sb, sc, p, st, at, bt, ct };
+    }
+    display() {
+        const { arrA, arrB, arrC, a, b, c, sa, sb, sc, p, st, at, bt, ct } = this.read();
+        getElement('_button_redo').style.display = this.undoIndex < 0 ? 'inline-block' : 'none';
+        getElement('_div_label_range_S').innerText = `A+B ≥ ${this.targetS}`;
+        getElement('_div_label_range_A').innerText = `A ≥ ${this.targetA}`;
+        getElement('_div_label_range_B').innerText = `B ≥ ${this.targetB}`;
+        getElement('_div_label_range_C').innerText = `C ≤ ${this.targetC}`;
+        getElement('_div_result_A').innerText = sa > 0 ? `${sa}` : '';
+        getElement('_div_result_B').innerText = sb > 0 ? `${sb}` : '';
+        getElement('_div_result_C').innerText = sc > 0 ? `${sc}` : '';
+        getElement('_select_P').value = `${p}`;
+        for (const i of 'ABC') {
+            const div = getElement(`_div_display_${i}`);
+            const arr = { A: arrA, B: arrB, C: arrC }[i];
+            for (let j = 0; j < div.children.length; j++) {
+                const item = div.children.item(j);
+                item.classList.remove('_fail');
+                if (j < arr.length) {
+                    item.innerText = '◆';
+                    if (arr[j] == false)
+                        item.classList.add('_fail');
+                }
+                else {
+                    item.innerText = '◇';
+                }
+            }
+        }
+        const state = { x: a, y: b, z: c, p: p, sx: sa, sy: sb, sz: sc };
+        const target = { st: st, xt: at, yt: bt, zt: ct };
+        const state_swap = { x: b, y: a, z: c, p: p, sx: sb, sy: sa, sz: sc };
+        const target_swap = { st: st, xt: bt, yt: at, zt: ct };
+        const path = App.instance.getPath(state, target);
+        const path_swap = App.instance.getPath(state_swap, target_swap);
+        const el_rec_A = getElement('_div_recommend_A');
+        const el_rec_B = getElement('_div_recommend_B');
+        const el_rec_C = getElement('_div_recommend_C');
+        el_rec_A.innerText = '';
+        el_rec_B.innerText = '';
+        el_rec_C.innerText = '';
+        if (this.isPreferB == false) {
+            if (path == 'X')
+                el_rec_A.innerText += 'Best!';
+            if (path == 'Y')
+                el_rec_B.innerText += 'Best!';
+            if (path == 'Z')
+                el_rec_C.innerText += 'Best!';
+            if (path_swap == 'X' && path != 'Y')
+                el_rec_B.innerText += '✓';
+            if (path_swap == 'Y' && path != 'X')
+                el_rec_A.innerText += '✓';
+            if (path_swap == 'Z' && path != 'Z')
+                el_rec_C.innerText += '✓';
+        }
+        else {
+            if (path_swap == 'X')
+                el_rec_B.innerText += 'Best!';
+            if (path_swap == 'Y')
+                el_rec_A.innerText += 'Best!';
+            if (path_swap == 'Z')
+                el_rec_C.innerText += 'Best!';
+            if (path == 'X' && path_swap != 'Y')
+                el_rec_A.innerText += '✓';
+            if (path == 'Y' && path_swap != 'X')
+                el_rec_B.innerText += '✓';
+            if (path == 'Z' && path_swap != 'Z')
+                el_rec_C.innerText += '✓';
+        }
+        this.drawTargetGraph(state, target);
+        if (App.instance.isDataLoaded() && ProbCalc.isLoaded) {
+            if (this.targetS == 0 &&
+                this.targetA == 0 &&
+                this.targetB == 0 &&
+                this.targetC == this.len) {
+                getElement('_div_target_probability').innerHTML = '&nbsp;';
+            }
+            else {
+                let targetProb = ProbCalc.instance.getProbability(state, target);
+                if (targetProb == 0) {
+                    getElement('_div_target_probability').innerHTML =
+                        'Goal probability: <span class="_fail">Failure</span>';
+                }
+                else if (targetProb == 1) {
+                    getElement('_div_target_probability').innerHTML = 'Goal probability: <span>SUCCESS</span>';
+                }
+                else {
+                    targetProb *= 100;
+                    const targetProbStr = targetProb < 1 ? targetProb.toFixed(4) : targetProb.toFixed(2);
+                    getElement('_div_target_probability').innerHTML = `Goal probability: <span>${targetProbStr}%</span>`;
+                }
+            }
+        }
+    }
+    drawNewTargetGraph() {
+        const svg = document.getElementById('_svg_target');
+        const height = 216.5625;
+        const width1 = height;
+        const width2 = 440.895;
+        const margin = {
+            top: 40,
+            bottom: 40,
+            left: 40,
+            middle: 80,
+            right: 80
+        };
+        const cellHeight = height / (this.len + 1);
+        const cellWidth1 = cellHeight;
+        const cellWidth2 = width2 / (2 * this.len + 1);
+        const fontSize = 22;
+        const axisStep = 2;
+        const xAxisDy = 23;
+        const yAxisDx = -8;
+        const yAxisDy = 10;
+        const xMarkDx = 15;
+        const yMarkDy = -10;
+        const markFill = 'blue';
+        const markFillC = 'red';
+        svg.setAttribute('viewBox', `0,0,${margin.left + width1 + margin.middle + width2 + margin.right},${margin.top + height + margin.bottom}`);
+        svg.innerHTML = '';
+        for (let a = 0; a <= this.len; a++) {
+            for (let b = 0; b <= this.len; b++) {
+                const rect = createSVG('rect', {
+                    x: margin.left + cellWidth1 * a,
+                    y: margin.top + height - cellHeight * (b + 1),
+                    width: cellWidth1,
+                    height: cellHeight,
+                    fill: 'none'
+                });
+                rect.id = `_rect_a${a}_b${b}`;
+                svg.appendChild(rect);
+            }
+        }
+        for (let a = 0; a <= this.len; a++) {
+            if (a % axisStep == 0) {
+                const text = createSVG('text', {
+                    x: margin.left + cellWidth1 * a + cellWidth1 / 2,
+                    y: margin.top + height,
+                    dy: xAxisDy,
+                    'text-anchor': 'middle',
+                    'font-size': fontSize
+                });
+                text.innerHTML = `${a}`;
+                svg.appendChild(text);
+            }
+        }
+        for (let b = 0; b <= this.len; b++) {
+            if (b % axisStep == 0) {
+                const text = createSVG('text', {
+                    x: margin.left,
+                    y: margin.top + height - b * cellHeight - cellHeight / 2,
+                    dx: yAxisDx,
+                    dy: yAxisDy,
+                    'text-anchor': 'end',
+                    'font-size': fontSize
+                });
+                text.innerHTML = `${b}`;
+                svg.appendChild(text);
+            }
+        }
+        for (let s = 0; s <= 2 * this.len; s++) {
+            for (let c = 0; c <= this.len; c++) {
+                const rect = createSVG('rect', {
+                    x: margin.left + width1 + margin.middle + cellWidth2 * s,
+                    y: margin.top + height - cellHeight * (c + 1),
+                    width: cellWidth2,
+                    height: cellHeight,
+                    fill: 'none'
+                });
+                rect.id = `_rect_s${s}_c${c}`;
+                svg.appendChild(rect);
+            }
+        }
+        for (let s = 0; s <= 2 * this.len; s++) {
+            if (s % axisStep == 0) {
+                const text = createSVG('text', {
+                    x: margin.left + width1 + margin.middle + cellWidth2 * s + cellWidth2 / 2,
+                    y: margin.top + height,
+                    dy: xAxisDy,
+                    'text-anchor': 'middle',
+                    'font-size': fontSize
+                });
+                text.innerHTML = `${s}`;
+                svg.appendChild(text);
+            }
+        }
+        for (let c = 0; c <= this.len; c++) {
+            if (c % axisStep == 0) {
+                const text = createSVG('text', {
+                    x: margin.left + width1 + margin.middle,
+                    y: margin.top + height - c * cellHeight - cellHeight / 2,
+                    dx: yAxisDx,
+                    dy: yAxisDy,
+                    'text-anchor': 'end',
+                    'font-size': fontSize
+                });
+                text.innerHTML = `${c}`;
+                svg.appendChild(text);
+            }
+        }
+        const mark_A = createSVG('text', {
+            x: margin.left + width1,
+            y: margin.top + height,
+            dx: xMarkDx,
+            dy: xAxisDy,
+            'font-weight': 'bold',
+            'font-size': fontSize,
+            fill: markFill
+        });
+        mark_A.innerHTML = 'A';
+        svg.appendChild(mark_A);
+        const mark_B = createSVG('text', {
+            x: margin.left,
+            y: margin.top,
+            dx: yAxisDx,
+            dy: yMarkDy,
+            'text-anchor': 'end',
+            'font-weight': 'bold',
+            'font-size': fontSize,
+            fill: markFill
+        });
+        mark_B.innerHTML = 'B';
+        svg.appendChild(mark_B);
+        const mark_S = createSVG('text', {
+            x: margin.left + width1 + margin.middle + width2,
+            y: margin.top + height,
+            dx: xMarkDx,
+            dy: xAxisDy,
+            'font-weight': 'bold',
+            'font-size': fontSize,
+            fill: markFill
+        });
+        mark_S.innerHTML = 'A+B';
+        svg.appendChild(mark_S);
+        const mark_C = createSVG('text', {
+            x: margin.left + width1 + margin.middle,
+            y: margin.top,
+            dx: yAxisDx,
+            dy: yMarkDy,
+            'text-anchor': 'end',
+            'font-weight': 'bold',
+            'font-size': fontSize,
+            fill: markFillC
+        });
+        mark_C.innerHTML = 'C';
+        svg.appendChild(mark_C);
+    }
+    drawTargetGraph(state, target) {
+        const { x, y, z, sx, sy, sz } = state;
+        let { st, xt, yt, zt } = target;
+        if (st < xt + yt)
+            st = xt + yt;
+        for (let a = 0; a <= this.len; a++) {
+            for (let b = 0; b <= this.len; b++) {
+                const rect = document.getElementById(`_rect_a${a}_b${b}`);
+                const isValid = a >= sx && a <= x + sx && b >= sy && b <= y + sy;
+                const isTarget = a >= xt && b >= yt && a + b >= st;
+                rect.classList.remove('_rect_valid');
+                rect.classList.remove('_rect_target');
+                if (isValid)
+                    rect.classList.add('_rect_valid');
+                if (isTarget)
+                    rect.classList.add('_rect_target');
+            }
+        }
+        for (let s = 0; s <= 2 * this.len; s++) {
+            for (let c = 0; c <= this.len; c++) {
+                const rect = document.getElementById(`_rect_s${s}_c${c}`);
+                const isValid = s >= sx + sy && s <= x + y + sx + sy && c >= sz && c <= z + sz;
+                const isTarget = s >= st && c <= zt;
+                rect.classList.remove('_rect_valid');
+                rect.classList.remove('_rect_target');
+                if (isValid)
+                    rect.classList.add('_rect_valid');
+                if (isTarget)
+                    rect.classList.add('_rect_target');
+            }
+        }
+    }
+}
+StateTable.isLoaded = false;
+function domStart() {
+    for (const i of 'SABC') {
+        getElement(`_input_range_${i}`).addEventListener('input', () => {
+            const el = getElement(`_input_range_${i}`);
+            let value = parseInt(el.value);
+            if ('SAB'.includes(i)) {
+                value = parseInt(el.max) - value;
+            }
+            StateTable.getInstance().setTarget(i, value);
+            StateTable.getInstance().display();
+        });
+    }
+    getElement('_select_N').addEventListener('change', () => {
+        const el = getElement('_select_N');
+        const value = parseInt(el.value);
+        StateTable.getInstance().hardReset(value);
+        StateTable.getInstance().reset();
+        StateTable.getInstance().display();
+    });
+    getElement('_select_P').addEventListener('change', () => {
+        const el = getElement('_select_P');
+        const value = parseInt(el.value);
+        StateTable.getInstance().setP(value);
+        StateTable.getInstance().display();
+    });
+    getElement('_div_display_A').addEventListener('click', () => {
+        StateTable.getInstance().setPreferB(false);
+    });
+    getElement('_div_display_B').addEventListener('click', () => {
+        StateTable.getInstance().setPreferB(true);
+    });
+    getElement('_checkbox_balance').addEventListener('change', () => {
+        const el = getElement('_checkbox_balance');
+        if (el.checked) {
+            StateTable.getInstance().isBalanceOn = true;
+        }
+        else {
+            StateTable.getInstance().isBalanceOn = false;
+        }
+        StateTable.getInstance().display();
+        StateTable.getInstance().balance();
+    });
+    getElement('_button_reset').addEventListener('click', () => {
+        StateTable.getInstance().reset();
+        StateTable.getInstance().display();
+    });
+    getElement('_button_auto').addEventListener('click', () => {
+        StateTable.getInstance().auto();
+        StateTable.getInstance().display();
+    });
+    for (const i of 'ABC') {
+        getElement(`_button_succ_${i}`).addEventListener('click', () => {
+            StateTable.getInstance().addState(i, 'S');
+            StateTable.getInstance().display();
+            StateTable.getInstance().balance();
+        });
+        getElement(`_button_fail_${i}`).addEventListener('click', () => {
+            StateTable.getInstance().addState(i, 'F');
+            StateTable.getInstance().display();
+            StateTable.getInstance().balance();
+        });
+        getElement(`_button_perform_${i}`).addEventListener('click', () => {
+            StateTable.getInstance().perform(i);
+            StateTable.getInstance().display();
+            StateTable.getInstance().balance();
+        });
+    }
+    getElement('_button_undo').addEventListener('click', () => {
+        StateTable.getInstance().undo();
+        StateTable.getInstance().display();
+        StateTable.getInstance().balance();
+    });
+    getElement('_button_redo').addEventListener('click', () => {
+        StateTable.getInstance().redo();
+        StateTable.getInstance().display();
+        StateTable.getInstance().balance();
+    });
+    StateTable.getInstance().hardReset(10);
+    StateTable.getInstance().display();
+    StateTable.isLoaded = true;
+}
+document.addEventListener('DOMContentLoaded', () => {
+    domStart();
+});
+})();
+</script>
